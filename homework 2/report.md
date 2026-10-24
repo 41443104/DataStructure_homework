@@ -25,7 +25,7 @@
 ### 開發環境
 - **IDE**: Microsoft Visual Studio Code (C/C++)
 
-### 程式碼實作+註解
+## 程式碼實作
 ```cpp
 #include <iostream>
 #include <cmath>
@@ -210,7 +210,7 @@ int main()
     return 0;
 }
 ```
-## 效能分析 (Analysis)
+## 效能分析
 
 1. 時間複雜度 (Time Complexity)：
 
@@ -226,7 +226,7 @@ int main()
 * Mult：乘法可能會產生 nm 個項目，所以最壞情況下需要 O(nm) 的空間。
 * Eval：只要一個變數來存加總結果，所以是 O(1)。
   
-## 測試與驗證 (Testing and Proving)
+## 測試與驗證 
 
 | 測試項目 | 輸入資料 | 預期輸出 | 實際輸出 | 狀態 |
 | --- | --- | --- | --- | --- |
