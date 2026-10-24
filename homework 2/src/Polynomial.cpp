@@ -2,118 +2,174 @@
 #include <cmath>
 using namespace std;
 
-struct Term {
-    float coef; // «Y¼Æ
-    int exp;    // ¦¸¤è
-};
+class Polynomial;
 
-class Polynomial {
+class Term
+{
 private:
-    Term termArray[50]; // ª½±µ¥Î©T©w¤j¤p°}¦C
-    int terms;          // «D¹s¶µ¼Æ¶q
-public:
-    Polynomial() {
-        terms = 0;
-    }
-
-    void AddTerm(float coef, int exp) {
-        // ÀË¬d¬O§_¦³¬Û¦P¦¸¤è
-        for (int i = 0; i < terms; i++) {
-            if (termArray[i].exp == exp) {
-                termArray[i].coef += coef;
-                return;
-            }
-        }
-        // ·s¼W¤@­Ó¶µ¥Ø
-        termArray[terms].coef = coef;
-        termArray[terms].exp = exp;
-        terms++;
-    }
-
-    float Eval(float x) {
-        float total = 0;
-        for (int i = 0; i < terms; i++) {
-            total += termArray[i].coef * pow(x, termArray[i].exp);
-        }
-        return total;
-    }
-
-    Polynomial Add(const Polynomial& p) {
-        Polynomial total;
-        for (int i = 0; i < terms; i++) {
-            total.AddTerm(termArray[i].coef, termArray[i].exp);
-        }
-        for (int j = 0; j < p.terms; j++) {
-            total.AddTerm(p.termArray[j].coef, p.termArray[j].exp);
-        }
-        return total;
-    }
-
-    Polynomial Mult(const Polynomial& p) {
-        Polynomial total;
-        for (int i = 0; i < terms; i++) {
-            for (int j = 0; j < p.terms; j++) {
-                float newCoef = termArray[i].coef * p.termArray[j].coef;
-                int newExp = termArray[i].exp + p.termArray[j].exp;
-                total.AddTerm(newCoef, newExp);
-            }
-        }
-        return total;
-    }
-
-    void Print() {
-        for (int i = 0; i < terms; i++) {
-            cout << termArray[i].coef;
-            if (termArray[i].exp > 0) {
-                cout << "x";
-                if (termArray[i].exp > 1) {
-                    cout << "^" << termArray[i].exp;
-                }
-            }
-            if (i < terms - 1) cout << " + ";
-        }
-    }
+    float coef; // ä¿‚æ•¸é …
+    int exp;    // æ¬¡æ–¹é …
+    friend class Polynomial;
 };
 
-int main() {
-    Polynomial p, q;
+class Polynomial
+{
+private:
+    Term* termArray; // éé›¶é …é™£åˆ—
+    int capacity;    // é™£åˆ—å®¹é‡
+    int terms;       // éé›¶é …æ•¸é‡
+public:
+    Polynomial();                  // å»ºæ§‹å­
+    void Input();                  // è¼¸å…¥å¤šé …å¼å‡½å¼
+    void Display();                // è¼¸å‡ºå¤šé …å¼å‡½å¼
+    float Eval(float n);           // å¤šé …å¼æ±‚å€¼
+    Polynomial Add(const Polynomial& p);   // å¤šé …å¼åŠ æ³•
+    Polynomial Mult(const Polynomial& p);  // å¤šé …å¼ä¹˜æ³•
+    void AddTerm(float coef, int exp);     // æ–°å¢é …
+};
+
+// å»ºæ§‹å­
+Polynomial::Polynomial()
+{
+    capacity = 10;                  // çµ¦ä¸€å€‹åˆå§‹å®¹é‡
+    terms = 0;
+    termArray = new Term[capacity]; // å‹•æ…‹é…ç½®é™£åˆ—
+}
+
+// è¼¸å…¥å‡½å¼ 
+void Polynomial::Input()
+{
     int n;
-
-    // ¿é¤J A(x)
-    cout << "½Ğ¿é¤J¦h¶µ¦¡ A(x) ¦³´X¶µ: ";
+    cout << "è«‹è¼¸å…¥å¤šé …å¼æœ‰å¹¾é …: ";
     cin >> n;
     for (int i = 0; i < n; i++) {
         float coef;
         int exp;
-        cout << "¿é¤J²Ä " << i + 1 << " ¶µªº«Y¼Æ»P¦¸¤è: ";
+        cout << "è¼¸å…¥ç¬¬ " << i + 1 << " é …çš„ä¿‚æ•¸èˆ‡æ¬¡æ–¹: ";
         cin >> coef >> exp;
-        p.AddTerm(coef, exp);
+        AddTerm(coef, exp);
+    }
+}
+
+// è¼¸å‡ºå‡½å¼ (ç›´æ¥å°å‡º A(x) çš„æ¨¡æ¨£)
+void Polynomial::Display()
+{
+    if (terms == 0) {
+        cout << "0";
+        return;
+    }
+    for (int i = 0; i < terms; i++) {
+        float c = termArray[i].coef;
+        int e = termArray[i].exp;
+
+        if (c > 0 && i > 0) cout << " + ";
+        else if (c < 0) cout << " - ";
+
+        cout << abs(c);
+        if (e > 0) {
+            cout << "x";
+            if (e > 1) {
+                cout << "^" << e;
+            }
+        }
+    }
+}
+
+// å¤šé …å¼æ±‚å€¼
+float Polynomial::Eval(float n)
+{
+    float total = 0;
+    for (int i = 0; i < terms; i++)
+    {
+        total += termArray[i].coef * pow(n, termArray[i].exp);
+    }
+    return total;
+}
+
+// å¤šé …å¼åŠ æ³•
+Polynomial Polynomial::Add(const Polynomial& p)
+{
+    Polynomial total;
+    for (int a = 0; a < terms; a++)
+    {
+        total.AddTerm(termArray[a].coef, termArray[a].exp);
+    }
+    for (int b = 0; b < p.terms; b++)
+    {
+        total.AddTerm(p.termArray[b].coef, p.termArray[b].exp);
+    }
+    return total;
+}
+
+// å¤šé …å¼ä¹˜æ³•
+Polynomial Polynomial::Mult(const Polynomial& p)
+{
+    Polynomial total;
+    for (int a = 0; a < terms; a++)
+    {
+        for (int b = 0; b < p.terms; b++)
+        {
+            float newcoef = termArray[a].coef * p.termArray[b].coef;
+            int newexp = termArray[a].exp + p.termArray[b].exp;
+            total.AddTerm(newcoef, newexp);
+        }
+    }
+    return total;
+}
+
+// æ–°å¢é …ï¼ˆè‹¥æ¬¡æ–¹ç›¸åŒå‰‡åˆä½µä¿‚æ•¸ï¼‰
+void Polynomial::AddTerm(float coef, int exp) {
+    if (coef == 0) return;
+
+    // æª¢æŸ¥æ˜¯å¦æœ‰ç›¸åŒæ¬¡æ–¹
+    for (int i = 0; i < terms; i++) {
+        if (termArray[i].exp == exp) {
+            termArray[i].coef += coef;
+            return;
+        }
     }
 
-    // ¿é¤J B(x)
-    cout << "½Ğ¿é¤J¦h¶µ¦¡ B(x) ¦³´X¶µ: ";
-    cin >> n;
-    for (int i = 0; i < n; i++) {
-        float coef;
-        int exp;
-        cout << "¿é¤J²Ä " << i + 1 << " ¶µªº«Y¼Æ»P¦¸¤è: ";
-        cin >> coef >> exp;
-        q.AddTerm(coef, exp);
+    // å¦‚æœå®¹é‡ä¸å¤ ï¼Œç°¡å–®æ”¾å¤§å…©å€
+    if (terms >= capacity) {
+        capacity = capacity * 2;
+        Term* temp = new Term[capacity];
+        for (int i = 0; i < terms; i++) {
+            temp[i] = termArray[i];
+        }
+        delete[] termArray;
+        termArray = temp;
     }
+    termArray[terms].coef = coef;
+    termArray[terms].exp = exp;
+    terms++;
+}
 
-    // ­pºâ
+int main()
+{
+    Polynomial p, q;
+
+    // è¼¸å…¥å¤šé …å¼ p èˆ‡ q
+    cout << "è¼¸å…¥å¤šé …å¼ A(x)\n";
+    p.Input();
+
+    cout << "\nè¼¸å…¥å¤šé …å¼ B(x)\n";
+    q.Input();
+
+    // è¨ˆç®—åŠ æ³•å’Œä¹˜æ³•
     Polynomial sum = p.Add(q);
     Polynomial prod = p.Mult(q);
 
+    // è¼¸å…¥ x
     float x;
-    cout << "¿é¤J x ªº­È: ";
+    cout << "\nè¼¸å…¥ x çš„å€¼: ";
     cin >> x;
 
-    // ¿é¥X
-    cout << "A(x) = "; p.Print(); cout << endl;
-    cout << "B(x) = "; q.Print(); cout << endl;
-    cout << "Sum = "; sum.Print(); cout << endl;
-    cout << "Product = "; prod.Print(); cout << endl;
+    // è¼¸å‡ºçµæœ
+    cout << "\n é‹ç®—çµæœ " << endl;
+    cout << "A(x) = "; p.Display(); cout << endl;
+    cout << "B(x) = "; q.Display(); cout << endl;
+    cout << "Sum = "; sum.Display(); cout << endl;
+    cout << "Product = "; prod.Display(); cout << endl;
     cout << "A(" << x << ") = " << p.Eval(x) << endl;
     cout << "B(" << x << ") = " << q.Eval(x) << endl;
 
