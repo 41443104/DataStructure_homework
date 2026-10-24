@@ -2,7 +2,6 @@
 
 # 作業一
 
----
 
 # 題目一：Ackermann Function
 
