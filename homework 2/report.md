@@ -225,12 +225,6 @@ int main()
 * Add：加法需要一個新的多項式來存結果，所以是 O(n+m)。
 * Mult：乘法可能會產生 nm 個項目，所以最壞情況下需要 O(nm) 的空間。
 * Eval：只要一個變數來存加總結果，所以是 O(1)。
-
-## 總結
-- 加法：快，因為只是把項目合併。
-- 乘法：慢，因為要每一項都互相相乘。
-- 求值：快，因為只是代入算一遍。
-- 擴容：偶爾會花比較多時間，但不常發生。
   
 ## 測試與驗證 (Testing and Proving)
 
@@ -244,11 +238,109 @@ int main()
 | 特殊案例 1 | A(x) = 空多項式 (全部係數為 0) | A(x) = 0 | A(x) = 0 | ✅ Pass |
 | 特殊案例 2 | A(x) = (1,1)、(-1,1) | A(x) = 0 (同次項合併後係數為 0) | A(x) = 0 | ✅ Pass |
 
-## 效能量測 (Measuring)
+### 測試輸入
+```
+輸入多項式 A(x)
+請輸入多項式有幾項: 3
+輸入第 1 項的係數與次方: 3 2
+輸入第 2 項的係數與次方: 2 1
+輸入第 3 項的係數與次方: 1 0
 
-* 在 VS Code 實際執行測試時，當多項式的項數在 10 項以內，加法與乘法的執行時間大約都在 1 毫秒（ms）以內，幾乎是瞬間完成，沒有感受到任何延遲。
-* 就算輸入的項次比較多、觸發到 AddTerm 的陣列兩倍放大（capacity = capacity * 2），因為電腦處理記憶體搬移的速度極快，整體流暢度依然非常好。
+輸入多項式 B(x)
+請輸入多項式有幾項: 2
+輸入第 1 項的係數與次方: 2 5
+輸入第 2 項的係數與次方: 3 1
+
+輸入 x 的值: 2
+```
+### 運算結果
+```
+A(x) = 3x^2 + 2x + 1
+B(x) = 2x^5 + 3x
+Sum = 3x^2 + 5x + 1 + 2x^5
+Product = 6x^7 + 9x^3 + 4x^6 + 6x^2 + 2x^5 + 3x
+A(2) = 17
+B(2) = 70
+```
+---
+
+## 效能量測 (Measuring)
+```cpp
+#include <iostream>
+#include <chrono>   // 用來計時
+using namespace std;
+using namespace std::chrono;
+
+// 放入自己的 Polynomial 類別和相關函式
+
+int main() {
+    Polynomial p, q;
+    cout << "輸入多項式 A(x)\n";
+    p.Input();
+    cout << "\n輸入多項式 B(x)\n";
+    q.Input();
+
+    // 測試加法時間
+    auto start_add = high_resolution_clock::now();
+    Polynomial sum = p.Add(q);
+    auto end_add = high_resolution_clock::now();
+    auto duration_add = duration_cast<microseconds>(end_add - start_add).count();
+    cout << "加法耗時: " << duration_add << " 微秒" << endl;
+
+    // 測試乘法時間
+    auto start_mult = high_resolution_clock::now();
+    Polynomial prod = p.Mult(q);
+    auto end_mult = high_resolution_clock::now();
+    auto duration_mult = duration_cast<microseconds>(end_mult - start_mult).count();
+    cout << "乘法耗時: " << duration_mult << " 微秒" << endl;
+
+    // 測試求值時間
+    float x;
+    cout << "\n輸入 x 的值: ";
+    cin >> x;
+    auto start_eval = high_resolution_clock::now();
+    float result = p.Eval(x);
+    auto end_eval = high_resolution_clock::now();
+    auto duration_eval = duration_cast<microseconds>(end_eval - start_eval).count();
+    cout << "A(" << x << ") = " << result << "，耗時: " << duration_eval << " 微秒" << endl;
+
+    return 0;
+}
+
+```
+### 執行
+```
+輸入多項式 A(x)
+請輸入多項式有幾項: 3
+輸入第 1 項的係數與次方: 3 2
+輸入第 2 項的係數與次方: 2 1
+輸入第 3 項的係數與次方: 1 0
+
+輸入多項式 B(x)
+請輸入多項式有幾項: 2
+輸入第 1 項的係數與次方: 2 5
+輸入第 2 項的係數與次方: 3 1
+加法耗時: 7 微秒
+乘法耗時: 4 微秒
+
+輸入 x 的值: 2
+A(2) = 17，耗時: 17 微秒
+```
+
+| 測試項目 | 輸入資料 | 實際耗時 | 測試環境 | 狀態 |
+| --- | --- | --- | --- | --- |
+| 加法 (A+B) | A(x) = 3x^2 + 2x + 1<br>B(x) = 2x^5 + 3x | 7 微秒 | VS Code (C++), Windows 10, Intel i5 CPU | ✅ Pass |
+| 乘法 (A*B) | A(x) = 3x^2 + 2x + 1<br>B(x) = 2x^5 + 3x | 4 微秒 | VS Code (C++), Windows 10, Intel i5 CPU | ✅ Pass |
+| 求值 (A(2)) | A(x) = 3x^2 + 2x + 1, x=2 | 17 微秒 | VS Code (C++), Windows 10, Intel i5 CPU | ✅ Pass |
+
+---
+### 總結
+- 加法：7 微秒，速度非常快。因為只是把項目合併。
+- 乘法：4 微秒，比加法還快，因為項數不多。
+- 求值：17 微秒，稍微久一點，但仍然在極快的範圍。
+- 擴容：偶爾會花比較多時間，但不常發生。
 
 ## 心得討論
 
-這次作業寫完之後，對 C++ 的類別封裝跟動態記憶體配置又更理解了。特別是在寫 AddTerm 的自動擴容機制時，體會到當原本的箱子裝不下時，必須「買個更大的新箱子 -> 把舊東西搬過去 -> 丟掉舊箱子」的整個過程。如果沒有做好 delete[] 就容易造成記憶體洩漏。透過這次動手寫，不僅順利解決了多項式的加乘與求值問題，也讓自己在寫程式時更有邏輯跟架構概念！
+寫完這次的作業後，我對 C++ 的類別封裝跟動態記憶體配置又更加理解了。特別是在寫 AddTerm 的自動擴容機制時，知到當原本的箱子裝不下時，必須「換個更大的新箱子 -> 把舊東西搬過去 -> 丟掉舊箱子」的整個過程。如果沒有做好 delete[] 就容易造成記憶體洩漏。
+透過這作業，不僅順利解決了多項式的加乘與求值問題，也讓自己在寫程式時更有邏輯跟架構概念！
