@@ -27,7 +27,7 @@
 ### 開發環境
 - **IDE**: Microsoft Visual Studio Code (C/C++)
 
-## 程式碼實作
+## 程式實作
 ```cpp
 #include <iostream>
 #include <cmath>
