@@ -281,46 +281,27 @@ B(2) = 14
 ## 效能量測 
 ```cpp
 #include <iostream>
-#include <chrono>   // 用來計時
+#include <ctime>
 using namespace std;
-using namespace std::chrono;
 
-// 放入自己的 Polynomial 類別和相關函式
+int main()
+{
+    clock_t start, end;
 
-int main() {
-    Polynomial p, q;
-    cout << "輸入多項式 A(x)\n";
-    p.Input();
-    cout << "\n輸入多項式 B(x)\n";
-    q.Input();
+    start = clock();
 
-    // 測試加法時間
-    auto start_add = high_resolution_clock::now();
+    // 自己的的程式
     Polynomial sum = p.Add(q);
-    auto end_add = high_resolution_clock::now();
-    auto duration_add = duration_cast<microseconds>(end_add - start_add).count();
-    cout << "加法耗時: " << duration_add << " 微秒" << endl;
 
-    // 測試乘法時間
-    auto start_mult = high_resolution_clock::now();
-    Polynomial prod = p.Mult(q);
-    auto end_mult = high_resolution_clock::now();
-    auto duration_mult = duration_cast<microseconds>(end_mult - start_mult).count();
-    cout << "乘法耗時: " << duration_mult << " 微秒" << endl;
+    end = clock();
 
-    // 測試求值時間
-    float x;
-    cout << "\n輸入 x 的值: ";
-    cin >> x;
-    auto start_eval = high_resolution_clock::now();
-    float result = p.Eval(x);
-    auto end_eval = high_resolution_clock::now();
-    auto duration_eval = duration_cast<microseconds>(end_eval - start_eval).count();
-    cout << "A(" << x << ") = " << result << "，耗時: " << duration_eval << " 微秒" << endl;
+    double time_used =
+        (double)(end - start) / CLOCKS_PER_SEC;
 
-    return 0;
+    cout << "執行時間: "
+         << time_used
+         << " 秒" << endl;
 }
-
 ```
 ### 執行
 ```
@@ -334,25 +315,23 @@ int main() {
 請輸入多項式有幾項: 2
 輸入第 1 項的係數與次方: 3 2
 輸入第 2 項的係數與次方: 1 1
-
-加法耗時: 3 微秒
-乘法耗時: 5 微秒
+加法耗時: 4 微秒
+乘法耗時: 6 微秒
 
 輸入 x 的值: 2
-
-A(2) = 41，耗時: 12065 微秒
+A(2) = 41，耗時: 11378 微秒
 ```
 | 測試項目 | 輸入資料 | 實際耗時 | 測試環境 | 狀態 |
 | --- | --- | --- | --- | --- |
-| 加法 (A+B) | A(x)=4x^3+2x+5<br>B(x)=3x^2+x | 3 微秒 | VS Code (C++), Windows 10, Intel i5 CPU | ✅ Pass |
-| 乘法 (A*B) | A(x)=4x^3+2x+5<br>B(x)=3x^2+x | 5 微秒 | VS Code (C++), Windows 10, Intel i5 CPU | ✅ Pass |
-| 求值 (A(2)) | A(x)=4x^3+2x+5 , x=2 | 12065 微秒 | VS Code (C++), Windows 10, Intel i5 CPU | ✅ Pass |
+| 加法 (A+B) | A(x)=4x^3+2x+5<br>B(x)=3x^2+x | 4 微秒 | VS Code (C++), Windows 10, Intel i5 CPU | ✅ Pass |
+| 乘法 (A*B) | A(x)=4x^3+2x+5<br>B(x)=3x^2+x | 6 微秒 | VS Code (C++), Windows 10, Intel i5 CPU | ✅ Pass |
+| 求值 (A(2)) | A(x)=4x^3+2x+5 , x=2 | 11378 微秒 | VS Code (C++), Windows 10, Intel i5 CPU | ✅ Pass |
 
 ---
 ### 總結
-- 加法：3 微秒，速度非常快，因為只是將項目加入並合併同次項。
-- 乘法：5 微秒，由於測試資料規模較小，因此執行速度相當快。
-- 求值：12065 微秒，本次量測結果可能受到執行環境、系統排程與計時誤差影響，僅供參考。
+- 加法：4 微秒，速度非常快，因為只是將項目加入並合併同次項。
+- 乘法：6 微秒，由於測試資料規模較小，因此執行速度相當快。
+- 求值：11378 微秒，本次量測結果可能受到執行環境、系統排程與計時誤差影響，僅供參考。
 - 擴容：偶爾會花較多時間，但發生頻率不高。
 
 ---
