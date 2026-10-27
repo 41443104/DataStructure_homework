@@ -54,7 +54,6 @@ private:
     int terms;       // 非零項數量
 public:
     Polynomial();                  // 建構子
-    ~Polynomial();                 // 解構函式
     void Input();                  // 輸入多項式函式
     void Display();                // 輸出多項式函式
     float Eval(float n);           // 多項式求值
@@ -71,11 +70,6 @@ Polynomial::Polynomial()
     termArray = new Term[capacity]; // 動態配置陣列
 }
 
-// 解構函式
-Polynomial::~Polynomial()
-{
-    delete[] termArray;
-}
 // 輸入函式 
 void Polynomial::Input()
 {
@@ -279,26 +273,100 @@ B(2) = 14
 ---
 
 ## 效能量測 
+
+為了觀察程式運算效率，本次利用 C++ `<chrono>` 函式庫進行高精度時間量測，分別測試多項式加法、乘法與求值功能的執行時間。
+
+### 量測程式
+
+```cpp
+#include <iostream>
+#include <chrono>   // 用來計時
+using namespace std;
+using namespace std::chrono;
+
+
+// 自己的 Polynomial 類別和相關函式
+
+
+int main() {
+    Polynomial p, q;
+    cout << "輸入多項式 A(x)\n";
+    p.Input();
+    cout << "\n輸入多項式 B(x)\n";
+    q.Input();
+
+
+    // 測試加法時間
+    auto start_add = high_resolution_clock::now();
+    Polynomial sum = p.Add(q);
+    auto end_add = high_resolution_clock::now();
+    auto duration_add = duration_cast<microseconds>(end_add - start_add).count();
+    cout << "加法耗時: " << duration_add << " 微秒" << endl;
+
+
+    // 測試乘法時間
+    auto start_mult = high_resolution_clock::now();
+    Polynomial prod = p.Mult(q);
+    auto end_mult = high_resolution_clock::now();
+    auto duration_mult = duration_cast<microseconds>(end_mult - start_mult).count();
+    cout << "乘法耗時: " << duration_mult << " 微秒" << endl;
+
+
+    // 測試求值時間
+    float x;
+    cout << "\n輸入 x 的值: ";
+    cin >> x;
+    auto start_eval = high_resolution_clock::now();
+    float result = p.Eval(x);
+    auto end_eval = high_resolution_clock::now();
+    auto duration_eval = duration_cast<microseconds>(end_eval - start_eval).count();
+    cout << "A(" << x << ") = " << result << "，耗時: " << duration_eval << " 微秒" << endl;
+
+
+    return 0;
+}
+```
+
 ### 測試環境
 
-- IDE：Visual Studio Code
-- Compiler：g++
+- IDE：Microsoft Visual Studio Code
+- 程式語言：C++
+- 編譯器：g++
 - 作業系統：Windows 10
-- CPU：Intel Core i5
+- 處理器：Intel Core i5
 
+### 測試資料
+
+- A(x) = 4x³ + 2x + 5
+- B(x) = 3x² + x
+- x = 2
 ### 執行結果
+```
+請輸入多項式有幾項: 3
+輸入第 1 項的係數與次方: 4 3
+輸入第 2 項的係數與次方: 2 1
+輸入第 3 項的係數與次方: 5 0
 
-| 功能 | 執行狀況 |
-|--------|--------|
-| Add() | 幾乎瞬間完成 |
-| Mult() | 幾乎瞬間完成 |
-| Eval() | 幾乎瞬間完成 |
+輸入多項式 B(x)
+請輸入多項式有幾項: 2
+輸入第 1 項的係數與次方: 3 2
+輸入第 2 項的係數與次方: 1 1
+加法耗時: 3 微秒
+乘法耗時: 4 微秒
 
-### 分析
+輸入 x 的值: 2
+A(2) = 41，耗時: 18 微秒
+```
+### 效能分析
 
-由於本次測試資料規模較小，因此加法、乘法以及求值運算都能在極短時間內完成。
+- Add() 主要透過 AddTerm() 合併同次項，因此執行時間會隨項數增加而增加。
+- Mult() 使用雙層迴圈逐項相乘，為整個程式中運算量最大的部分。
+- Eval() 僅需要將各項代入並累加，因此執行效率最佳。
+- 使用 `<chrono>` 能以微秒（microseconds）為單位進行量測，使結果更精確。
 
-根據時間複雜度分析，當多項式項數增加時，乘法運算的執行成本會成長最快，而求值運算效率最佳。
+### 結論
+
+根據實際量測結果，本程式能快速完成多項式加法、乘法與求值運算。在測試資料規模下，所有功能皆能在極短時間內完成，沒有明顯延遲現象。當多項式項數增加時，乘法運算的執行成本將成長最快，這也與前述時間複雜度分析結果一致。
 
 ---
 
