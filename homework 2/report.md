@@ -54,6 +54,7 @@ private:
     int terms;       // 非零項數量
 public:
     Polynomial();                  // 建構子
+    ~Polynomial();                 // 解構函式
     void Input();                  // 輸入多項式函式
     void Display();                // 輸出多項式函式
     float Eval(float n);           // 多項式求值
@@ -70,6 +71,11 @@ Polynomial::Polynomial()
     termArray = new Term[capacity]; // 動態配置陣列
 }
 
+// 解構函式
+Polynomial::~Polynomial()
+{
+    delete[] termArray;
+}
 // 輸入函式 
 void Polynomial::Input()
 {
