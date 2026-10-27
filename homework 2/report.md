@@ -333,19 +333,18 @@ int main() {
 輸入第 1 項的係數與次方: 3 2
 輸入第 2 項的係數與次方: 1 1
 
-加法耗時: 8 微秒
+加法耗時: 3 微秒
 乘法耗時: 5 微秒
 
 輸入 x 的值: 2
 
-A(2) = 41，耗時: 16 微秒
+A(2) = 41，耗時: 12065 微秒
 ```
-
 | 測試項目 | 輸入資料 | 實際耗時 | 測試環境 | 狀態 |
 | --- | --- | --- | --- | --- |
-| 加法 (A+B) | A(x)=4x^3+2x+5<br>B(x)=3x^2+x | 8 微秒 | VS Code (C++), Windows 10, Intel i5 CPU | ✅ Pass |
+| 加法 (A+B) | A(x)=4x^3+2x+5<br>B(x)=3x^2+x | 3 微秒 | VS Code (C++), Windows 10, Intel i5 CPU | ✅ Pass |
 | 乘法 (A*B) | A(x)=4x^3+2x+5<br>B(x)=3x^2+x | 5 微秒 | VS Code (C++), Windows 10, Intel i5 CPU | ✅ Pass |
-| 求值 (A(2)) | A(x)=4x^3+2x+5, x=2 | 16 微秒 | VS Code (C++), Windows 10, Intel i5 CPU | ✅ Pass |
+| 求值 (A(2)) | A(x)=4x^3+2x+5 , x=2 | 12065 微秒 | VS Code (C++), Windows 10, Intel i5 CPU | ✅ Pass |
 
 ---
 ### 總結
