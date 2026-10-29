@@ -7,14 +7,12 @@
 using namespace std;
 using namespace std::chrono;
 
-class Polynomial;
-
 class Term
 {
 private:
     float coef; // 係數項
     int exp;    // 次方項
-    friend class Polynomial; // 讓 Polynomial 類別可以直接存取
+    friend class Polynomial; // 讓Polynomial類別可以直接用
 };
 
 class Polynomial
@@ -25,28 +23,50 @@ private:
     int terms;       // 非零項數量
 public:
     Polynomial();                     // 建構子
+    void Input();                     // 輸入多項式函式
     void Display();                   // 輸出多項式函式
     float Eval(float n);              // 多項式求值
     Polynomial Add(const Polynomial& p);   // 多項式加法
     Polynomial Mult(const Polynomial& p);  // 多項式乘法
-    void AddTerm(float coef, int exp);     // 新增項（會自動依次方由大到小排序）
+    void AddTerm(float coef, int exp);     // 新增項
 };
 
 // 建構子
 Polynomial::Polynomial()
 {
-    capacity = 8;                     // 初始容量
+    capacity = 8;                     // 給一個初始容量
     terms = 0;
     termArray = new Term[capacity]; // 動態配置陣列
 }
 
-// 輸出函式 (印出多項式模樣)
+// 輸入函式 
+void Polynomial::Input()
+{
+    int n;
+    cout << "請輸入多項式有幾項: ";
+    cin >> n;
+    for (int i = 0; i < n; i++) {
+        float coef;
+        int exp;
+        cout << "輸入第 " << i + 1 << " 項的係數與次方: ";
+        cin >> coef >> exp;
+        if (exp < 0)
+        {
+            cout << "次方不能為負 "<< endl;
+        }
+
+        AddTerm(coef, exp);     // 呼叫AddTerm自動處理合併跟擴容
+
+    }
+}
+
+// 輸出函式 (直接印出 A(x) 多項式的模樣)
 void Polynomial::Display()
 {
     if (terms == 0)
-    {
+    {   // 沒有東西就輸出0
         cout << "0";
-        return;
+        return ;
     }
     for (int i = 0; i < terms; i++) {
         float c = termArray[i].coef;
@@ -68,7 +88,7 @@ void Polynomial::Display()
     }
 }
 
-// 多項式求值 (算 P(n))
+// 多項式求值 (算P(n))
 float Polynomial::Eval(float n)
 {
     float total = 0;
@@ -82,58 +102,60 @@ float Polynomial::Eval(float n)
 // 多項式加法 (合併兩個多項式)
 Polynomial Polynomial::Add(const Polynomial& p)
 {
-    Polynomial total;
+    Polynomial total;   // 新的多項式用來存結果
+    // 先把"自己"的所有項目丟進 total
     for (int a = 0; a < terms; a++)
     {
         total.AddTerm(termArray[a].coef, termArray[a].exp);
     }
+    // 再把"另一個多項式P"的所有項目丟進 total
     for (int b = 0; b < p.terms; b++)
     {
         total.AddTerm(p.termArray[b].coef, p.termArray[b].exp);
     }
-    return total;
+    return total;   // 回傳合併完成的多項式
 }
 
 // 多項式乘法 (逐項相乘後合併同次項)
 Polynomial Polynomial::Mult(const Polynomial& p)
 {
-    Polynomial total;
+    Polynomial total;   // 新的多項式 用來存結果
     for (int a = 0; a < terms; a++)
     {
         for (int b = 0; b < p.terms; b++)
         {
             float newcoef = termArray[a].coef * p.termArray[b].coef;
             int newexp = termArray[a].exp + p.termArray[b].exp;
-            total.AddTerm(newcoef, newexp);
+            total.AddTerm(newcoef, newexp); // 把結果丟進去
         }
     }
     return total;
 }
 
-// 新增項（若次方相同則相加，並保持次方由大到小排序）
+// 新增項（若次方相同則合併係數，並保持由大到小排序）
 void Polynomial::AddTerm(float coef, int exp) {
     if (coef == 0) return;  // 係數為 0 不需要加入
 
-    // 1. 檢查有沒有相同次方，有就直接把係數相加
+    // 檢查有沒有相同次方，有就直接相加係數
     for (int i = 0; i < terms; i++) {
         if (termArray[i].exp == exp) {
             termArray[i].coef += coef;
-            return;
+            return; // 找到同次項就更新 不新增新項
         }
     }
 
-    // 2. 如果容量不夠，放大兩倍
+    // 如果容量不夠 放大兩倍
     if (terms >= capacity) {
         capacity = capacity * 2;
         Term* temp = new Term[capacity];
         for (int i = 0; i < terms; i++) {
-            temp[i] = termArray[i];
+            temp[i] = termArray[i]; // 搬移舊的資料
         }
-        delete[] termArray;
-        termArray = temp;
+        delete[] termArray; // 刪掉舊的陣列
+        termArray = temp;   // 指向新陣列
     }
 
-    // 3. 尋找正確的插入位置（保持次方由大到小排序）
+    // 尋找由大到小排序的插入位置
     int insertIndex = terms;
     for (int i = 0; i < terms; i++) {
         if (exp > termArray[i].exp) {
@@ -147,12 +169,11 @@ void Polynomial::AddTerm(float coef, int exp) {
         termArray[i] = termArray[i - 1];
     }
 
-    // 插入新項
+    // 在正確的位置插入新項
     termArray[insertIndex].coef = coef;
     termArray[insertIndex].exp = exp;
     terms++;
 }
-
 int main() {
     // 亂數種子
     srand(time(0));
