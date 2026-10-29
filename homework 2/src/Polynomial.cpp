@@ -19,10 +19,10 @@ private:
     int capacity;    // 陣列容量
     int terms;       // 非零項數量
 public:
-    Polynomial();                  // 建構子
-    void Input();                  // 輸入多項式函式
-    void Display();                // 輸出多項式函式
-    float Eval(float n);           // 多項式求值
+    Polynomial();                     // 建構子
+    void Input();                     // 輸入多項式函式
+    void Display();                   // 輸出多項式函式
+    float Eval(float n);              // 多項式求值
     Polynomial Add(const Polynomial& p);   // 多項式加法
     Polynomial Mult(const Polynomial& p);  // 多項式乘法
     void AddTerm(float coef, int exp);     // 新增項
@@ -31,7 +31,7 @@ public:
 // 建構子
 Polynomial::Polynomial()
 {
-    capacity = 8;                  // 給一個初始容量
+    capacity = 8;                     // 給一個初始容量
     terms = 0;
     termArray = new Term[capacity]; // 動態配置陣列
 }
@@ -54,7 +54,6 @@ void Polynomial::Input()
 
         AddTerm(coef, exp);     // 呼叫AddTerm自動處理合併跟擴容
 
-        
     }
 }
 
@@ -130,11 +129,11 @@ Polynomial Polynomial::Mult(const Polynomial& p)
     return total;
 }
 
-// 新增項（若次方相同則合併係數）
+// 新增項（若次方相同則合併係數，並保持由大到小排序）
 void Polynomial::AddTerm(float coef, int exp) {
     if (coef == 0) return;  // 係數為 0 不需要加入
 
-    // 檢查有沒有相同次方
+    // 檢查有沒有相同次方，有就直接相加係數
     for (int i = 0; i < terms; i++) {
         if (termArray[i].exp == exp) {
             termArray[i].coef += coef;
@@ -152,7 +151,8 @@ void Polynomial::AddTerm(float coef, int exp) {
         delete[] termArray; // 刪掉舊的陣列
         termArray = temp;   // 指向新陣列
     }
-    // 把次方由大到小排序
+
+    // 尋找由大到小排序的插入位置
     int insertIndex = terms;
     for (int i = 0; i < terms; i++) {
         if (exp > termArray[i].exp) {
@@ -165,9 +165,10 @@ void Polynomial::AddTerm(float coef, int exp) {
     for (int i = terms; i > insertIndex; i--) {
         termArray[i] = termArray[i - 1];
     }
-    // 新增新項
-    termArray[terms].coef = coef;
-    termArray[terms].exp = exp;
+
+    // 在正確的位置插入新項
+    termArray[insertIndex].coef = coef;
+    termArray[insertIndex].exp = exp;
     terms++;
 }
 
