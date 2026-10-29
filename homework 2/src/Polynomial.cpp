@@ -47,7 +47,15 @@ void Polynomial::Input()
         int exp;
         cout << "輸入第 " << i + 1 << " 項的係數與次方: ";
         cin >> coef >> exp;
-        AddTerm(coef, exp);     // 呼叫AddTerm自動處理合併跟擴容
+        if (exp < 0)
+        {
+            cout << "次方不能為負 "<< endl;
+        }
+        else
+        {
+            AddTerm(coef, exp);     // 呼叫AddTerm自動處理合併跟擴容
+        }
+        
     }
 }
 
