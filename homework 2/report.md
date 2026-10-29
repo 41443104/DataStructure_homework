@@ -301,8 +301,7 @@ B(2) = 14
 ### 總結
 
 * **最耗記憶體的地方**：動態陣列（termArray），當項數超過容量時，程式會自動把陣列放大兩倍，空間隨項數成長（$O(T)$）。
-* **最耗時間的地方**：AddTerm 裡面的檢查機制（每次加入都要從頭檢查有沒有同次方），導致加法和乘法在項數多時會變比較慢。
-
+* **最耗時間的地方**：AddTerm 的檢查機制（每次加入都要從頭檢查有沒有同次方），導致加法和乘法在項數多時會變比較慢。
 
 ---
 
@@ -314,89 +313,97 @@ B(2) = 14
 
 ```cpp
 #include <iostream>
+#include <cmath>
 #include <chrono>   // 用來計時
+#include <cstdlib>  // 為了用 rand()
+#include <ctime>    // 為了用 time()
+
 using namespace std;
 using namespace std::chrono;
 
-
-// 自己的 Polynomial 類別和相關函式
-
-
 int main() {
-    Polynomial p, q;
-    cout << "輸入多項式 A(x)\n";
-    p.Input();
-    cout << "\n輸入多項式 B(x)\n";
-    q.Input();
+    // 亂數種子
+    srand(time(0));
 
+    cout << "=== 多項式自動化效能評測程式 ===" << endl;
 
-    // 測試加法時間
-    auto start_add = high_resolution_clock::now();
-    Polynomial sum = p.Add(q);
-    auto end_add = high_resolution_clock::now();
-    auto duration_add = duration_cast<microseconds>(end_add - start_add).count();
-    cout << "加法耗時: " << duration_add << " 微秒" << endl;
+    // 設定要測試的不同項數規模
+    int testSizes[] = { 10, 50, 100, 500, 1000 };
 
+    for (int size : testSizes) {
+        Polynomial p, q;
 
-    // 測試乘法時間
-    auto start_mult = high_resolution_clock::now();
-    Polynomial prod = p.Mult(q);
-    auto end_mult = high_resolution_clock::now();
-    auto duration_mult = duration_cast<microseconds>(end_mult - start_mult).count();
-    cout << "乘法耗時: " << duration_mult << " 微秒" << endl;
+        // 自動隨機產生指定項數的多項式 p 與 q
+        for (int i = 0; i < size; i++) {
+            float coef1 = (rand() % 10) + 1;
+            int exp1 = rand() % (size * 2);
+            p.AddTerm(coef1, exp1);
 
+            float coef2 = (rand() % 10) + 1;
+            int exp2 = rand() % (size * 2);
+            q.AddTerm(coef2, exp2);
+        }
 
-    // 測試求值時間
-    float x;
-    cout << "\n輸入 x 的值: ";
-    cin >> x;
-    auto start_eval = high_resolution_clock::now();
-    float result = p.Eval(x);
-    auto end_eval = high_resolution_clock::now();
-    auto duration_eval = duration_cast<microseconds>(end_eval - start_eval).count();
-    cout << "A(" << x << ") = " << result << "，耗時: " << duration_eval << " 微秒" << endl;
+        cout << "\n----------------------------------------" << endl;
+        cout << "【測試規模】目標項數: " << size << " 項" << endl;
 
+        // 1. 測試加法耗時
+        auto start_add = high_resolution_clock::now();
+        Polynomial sum = p.Add(q);
+        auto end_add = high_resolution_clock::now();
+        auto duration_add = duration_cast<microseconds>(end_add - start_add).count();
+        cout << "-> 加法耗時: " << duration_add << " 微秒" << endl;
 
+        // 2. 測試乘法耗時（項數大於 500 時乘法會比較久，故超過 500 可自行決定是否略過）
+        if (size <= 1000) {
+            auto start_mult = high_resolution_clock::now();
+            Polynomial prod = p.Mult(q);
+            auto end_mult = high_resolution_clock::now();
+            auto duration_mult = duration_cast<microseconds>(end_mult - start_mult).count();
+            cout << "-> 乘法耗時: " << duration_mult << " 微秒" << endl;
+        }
+
+        // 3. 測試求值耗時 (以 x = 1.5 為例)
+        auto start_eval = high_resolution_clock::now();
+        float res = p.Eval(1.5f);
+        auto end_eval = high_resolution_clock::now();
+        auto duration_eval = duration_cast<microseconds>(end_eval - start_eval).count();
+        cout << "-> 求值耗時 (Eval): " << duration_eval << " 微秒" << endl;
+    }
+
+    cout << "\n=== 測試完畢 ===" << endl;
     return 0;
 }
 ```
 
-### 測試環境
-
-- IDE：Microsoft Visual Studio Code
-- 程式語言：C++
-- 作業系統：Windows 10
-- 處理器：Intel Core i5
-
-### 測試資料
-
-- A(x) = 4x³ + 2x + 5
-- B(x) = 3x² + x
-- x = 2
 ### 測試結果
 ```
-請輸入多項式有幾項: 3
-輸入第 1 項的係數與次方: 4 3
-輸入第 2 項的係數與次方: 2 1
-輸入第 3 項的係數與次方: 5 0
+=== 多項式自動效能與規模測試 (大範圍評測) ===
 
-輸入多項式 B(x)
-請輸入多項式有幾項: 2
-輸入第 1 項的係數與次方: 3 2
-輸入第 2 項的係數與次方: 1 1
-加法耗時: 3 微秒
-乘法耗時: 4 微秒
+----------------------------------------
+【測試規模】目標項數約: 10 項
+-> 加法耗時: 2 微秒
+-> 乘法耗時: 4 微秒
+-> A(1.5) 求值耗時: 6 微秒
 
-輸入 x 的值: 2
-A(2) = 41，耗時: 18 微秒
+----------------------------------------
+【測試規模】目標項數約: 50 項
+-> 加法耗時: 7 微秒
+-> 乘法耗時: 128 微秒
+-> A(1.5) 求值耗時: 3 微秒
+
+----------------------------------------
+【測試規模】目標項數約: 100 項
+-> 加法耗時: 33 微秒
+-> 乘法耗時: 1330 微秒
+-> A(1.5) 求值耗時: 5 微秒
+
+----------------------------------------
+【測試規模】目標項數約: 500 項
+-> 加法耗時: 341 微秒
+-> 乘法耗時: 106249 微秒
+-> A(1.5) 求值耗時: 21 微秒
 ```
-
-
-| 功能 | 執行時間 |
-|------|------|
-| Add() | 3 微秒 |
-| Mult() | 4 微秒 |
-| Eval() | 18 微秒 |
 
 ### 效能分析
 
