@@ -83,9 +83,10 @@ void Polynomial::Input()
 // 輸出函式 (直接印出 A(x) 多項式的模樣)
 void Polynomial::Display()
 {
-    if (terms == 0) {   // 沒有東西就輸出0
+    if (terms == 0)
+    {   // 沒有東西就輸出0
         cout << "0";
-        return;
+        return ;
     }
     for (int i = 0; i < terms; i++) {
         float c = termArray[i].coef;
@@ -173,6 +174,19 @@ void Polynomial::AddTerm(float coef, int exp) {
         delete[] termArray; // 刪掉舊的陣列
         termArray = temp;   // 指向新陣列
     }
+    // 把次方由大到小排序
+    int insertIndex = terms;
+    for (int i = 0; i < terms; i++) {
+        if (exp > termArray[i].exp) {
+            insertIndex = i;
+            break;
+        }
+    }
+
+    // 將後面的項目往後搬移
+    for (int i = terms; i > insertIndex; i--) {
+        termArray[i] = termArray[i - 1];
+    }
     // 新增新項
     termArray[terms].coef = coef;
     termArray[terms].exp = exp;
@@ -207,6 +221,7 @@ int main()
     cout << "Product = "; prod.Display(); cout << endl;
     cout << "A(" << x << ") = " << p.Eval(x) << endl;
     cout << "B(" << x << ") = " << q.Eval(x) << endl;
+
     return 0;
 }
 ```
@@ -224,7 +239,7 @@ int main()
 
 ---
 
-### 2. Polynomial 類別與成員函式
+### 2. Polynomial 類別與成員函式(`T` 代表多項式目前總共有幾項（Non-zero terms）)
 
 #### (1) 建構子 Polynomial()
 
@@ -272,7 +287,7 @@ int main()
 
 * **空間複雜度**：O(T)（動態調整容量，分攤下來為 amortized O(1)，但整體規模與項數成正比）。
   
-### 複雜度分析表
+### 3. 複雜度分析表
 `T` 代表多項式目前總共有幾項（Non-zero terms）。
 
 | 函式名稱 | 時間複雜度 (Time Complexity) | 空間複雜度 (Space Complexity) | 解釋 |
