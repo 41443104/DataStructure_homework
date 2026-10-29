@@ -44,10 +44,10 @@ private:
     int capacity;    // 陣列容量
     int terms;       // 非零項數量
 public:
-    Polynomial();                  // 建構子
-    void Input();                  // 輸入多項式函式
-    void Display();                // 輸出多項式函式
-    float Eval(float n);           // 多項式求值
+    Polynomial();                     // 建構子
+    void Input();                     // 輸入多項式函式
+    void Display();                   // 輸出多項式函式
+    float Eval(float n);              // 多項式求值
     Polynomial Add(const Polynomial& p);   // 多項式加法
     Polynomial Mult(const Polynomial& p);  // 多項式乘法
     void AddTerm(float coef, int exp);     // 新增項
@@ -56,7 +56,7 @@ public:
 // 建構子
 Polynomial::Polynomial()
 {
-    capacity = 8;                  // 給一個初始容量
+    capacity = 8;                     // 給一個初始容量
     terms = 0;
     termArray = new Term[capacity]; // 動態配置陣列
 }
@@ -74,7 +74,7 @@ void Polynomial::Input()
         cin >> coef >> exp;
         if (exp < 0)
         {
-            cout << "次方不能為負 "<< endl;
+            cout << "次方不能為負，去除此項 " << endl;
         }
 
         AddTerm(coef, exp);     // 呼叫AddTerm自動處理合併跟擴容
@@ -88,7 +88,7 @@ void Polynomial::Display()
     if (terms == 0)
     {   // 沒有東西就輸出0
         cout << "0";
-        return ;
+        return;
     }
     for (int i = 0; i < terms; i++) {
         float c = termArray[i].coef;
@@ -154,11 +154,11 @@ Polynomial Polynomial::Mult(const Polynomial& p)
     return total;
 }
 
-// 新增項（若次方相同則合併係數）
+// 新增項（若次方相同則合併係數，並保持由大到小排序）
 void Polynomial::AddTerm(float coef, int exp) {
     if (coef == 0) return;  // 係數為 0 不需要加入
-
-    // 檢查有沒有相同次方
+    if (exp <= 0) return;
+    // 檢查有沒有相同次方，有就直接相加係數
     for (int i = 0; i < terms; i++) {
         if (termArray[i].exp == exp) {
             termArray[i].coef += coef;
@@ -176,7 +176,8 @@ void Polynomial::AddTerm(float coef, int exp) {
         delete[] termArray; // 刪掉舊的陣列
         termArray = temp;   // 指向新陣列
     }
-    // 把次方由大到小排序
+
+    // 尋找由大到小排序的插入位置
     int insertIndex = terms;
     for (int i = 0; i < terms; i++) {
         if (exp > termArray[i].exp) {
@@ -189,9 +190,10 @@ void Polynomial::AddTerm(float coef, int exp) {
     for (int i = terms; i > insertIndex; i--) {
         termArray[i] = termArray[i - 1];
     }
-    // 新增新項
-    termArray[terms].coef = coef;
-    termArray[terms].exp = exp;
+
+    // 在正確的位置插入新項
+    termArray[insertIndex].coef = coef;
+    termArray[insertIndex].exp = exp;
     terms++;
 }
 
@@ -216,11 +218,11 @@ int main()
     cin >> x;
 
     // 輸出結果
-    cout << "\n 運算結果 " << endl;
+    cout << "運算結果" << endl;
     cout << "A(x) = "; p.Display(); cout << endl;
     cout << "B(x) = "; q.Display(); cout << endl;
-    cout << "Sum = "; sum.Display(); cout << endl;
-    cout << "Product = "; prod.Display(); cout << endl;
+    cout << "A+B = "; sum.Display(); cout << endl;
+    cout << "A*B = "; prod.Display(); cout << endl << endl;
     cout << "A(" << x << ") = " << p.Eval(x) << endl;
     cout << "B(" << x << ") = " << q.Eval(x) << endl;
 
@@ -259,8 +261,8 @@ int main()
 ```
 A(x) = 4x^3 + 2x + 5
 B(x) = 3x^2 + 1x
-Sum = 4x^3 + 3x^2 + 3x + 5
-Product = 12x^5 + 4x^4 + 6x^3 + 17x^2 + 5x
+A+B = 4x^3 + 3x^2 + 3x + 5
+A*B = 12x^5 + 4x^4 + 6x^3 + 17x^2 + 5x
 A(2) = 41
 B(2) = 14
 ```
@@ -286,7 +288,7 @@ B(2) = 14
 
 | 函式名稱 | 時間複雜度 (Time Complexity) | 空間複雜度 (Space Complexity) | 解釋 |
 | :--- | :--- | :--- | :--- |
-| **建構子 (`Polynomial`)** | $O(1)$ | $O(1)$ | 一開始設定初始值 10 個位置的空間，瞬間完成。 |
+| **建構子 (`Polynomial`)** | $O(1)$ | $O(1)$ | 一開始設定初始值 8 個位置的空間，瞬間完成。 |
 | **輸入 (`Input`)** | $O(n^2)$ | $O(n)$ | 每輸入一項都要檢查同次方並擴容，項數越多越慢。 |
 | **輸出 (`Display`)** | $O(T)$ | $O(1)$ | 有幾項就照順序印幾項，項數越多印越久。 |
 | **求值 (`Eval`)** | $O(T)$ | $O(1)$ | 把 $x$ 代進每一項算一次，有幾項就做幾次數學計算。 |
@@ -437,7 +439,7 @@ int main() {
 ---
 
 ### 多項式乘法 Mult()  
-- 使用雙層迴圈，將每一項彼此相乘。  
+- 使用兩個迴圈，把每一項相乘。  
 - 計算方式：新係數 = 係數相乘，新次方 = 次方相加。  
 - 呼叫 `AddTerm()` 將結果項加入，並自動合併同次項。  
 
