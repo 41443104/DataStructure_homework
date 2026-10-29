@@ -49,7 +49,7 @@ void Polynomial::Input()
         cin >> coef >> exp;
         if (exp < 0)
         {
-            cout << "次方不能為負 "<< endl;
+            cout << "次方不能為負，去除此項 " << endl;
         }
 
         AddTerm(coef, exp);     // 呼叫AddTerm自動處理合併跟擴容
@@ -63,7 +63,7 @@ void Polynomial::Display()
     if (terms == 0)
     {   // 沒有東西就輸出0
         cout << "0";
-        return ;
+        return;
     }
     for (int i = 0; i < terms; i++) {
         float c = termArray[i].coef;
@@ -132,7 +132,7 @@ Polynomial Polynomial::Mult(const Polynomial& p)
 // 新增項（若次方相同則合併係數，並保持由大到小排序）
 void Polynomial::AddTerm(float coef, int exp) {
     if (coef == 0) return;  // 係數為 0 不需要加入
-
+    if (exp <= 0) return;
     // 檢查有沒有相同次方，有就直接相加係數
     for (int i = 0; i < terms; i++) {
         if (termArray[i].exp == exp) {
@@ -193,11 +193,11 @@ int main()
     cin >> x;
 
     // 輸出結果
-    cout << "\n 運算結果 " << endl;
+    cout << "運算結果" << endl;
     cout << "A(x) = "; p.Display(); cout << endl;
     cout << "B(x) = "; q.Display(); cout << endl;
-    cout << "Sum = "; sum.Display(); cout << endl;
-    cout << "Product = "; prod.Display(); cout << endl;
+    cout << "A+B = "; sum.Display(); cout << endl;
+    cout << "A*B = "; prod.Display(); cout << endl << endl;
     cout << "A(" << x << ") = " << p.Eval(x) << endl;
     cout << "B(" << x << ") = " << q.Eval(x) << endl;
 
