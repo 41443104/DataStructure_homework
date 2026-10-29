@@ -51,10 +51,9 @@ void Polynomial::Input()
         {
             cout << "次方不能為負 "<< endl;
         }
-        else
-        {
-            AddTerm(coef, exp);     // 呼叫AddTerm自動處理合併跟擴容
-        }
+
+        AddTerm(coef, exp);     // 呼叫AddTerm自動處理合併跟擴容
+
         
     }
 }
