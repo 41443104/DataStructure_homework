@@ -219,12 +219,12 @@ int main() {
             cout << "-> 乘法耗時: (規模過大，略過避免計算過久)" << endl;
         }
 
-        // 3. 測試求值時間 (以 x = 1.5 為例)
+        // 3. 測試求值時間 (以 x = 2 為例)
         auto start_eval = high_resolution_clock::now();
-        float res = p.Eval(1.5f);
+        float res = p.Eval(2);
         auto end_eval = high_resolution_clock::now();
         auto duration_eval = duration_cast<microseconds>(end_eval - start_eval).count();
-        cout << "-> A(1.5) 求值耗時: " << duration_eval << " 微秒" << endl;
+        cout << "-> A(2) 求值耗時: " << duration_eval << " 微秒" << endl;
     }
 
     return 0;
