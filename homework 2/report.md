@@ -60,7 +60,7 @@ public:
 // 建構子
 Polynomial::Polynomial()
 {
-    capacity = 10;                  // 給一個初始容量
+    capacity = 8;                  // 給一個初始容量
     terms = 0;
     termArray = new Term[capacity]; // 動態配置陣列
 }
